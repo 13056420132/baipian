@@ -348,7 +348,32 @@
             .ai-content { font-size: 13px; padding: 12px; }
         }
         
-        .input_video { display: none; }
+        /* Hand Pointer */
+        #hand-pointer {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: var(--highlight-color);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            display: none;
+            box-shadow: 0 0 15px var(--highlight-color), 0 0 30px var(--accent-color);
+            transition: transform 0.1s ease-out;
+            border: 2px solid white;
+        }
+        #hand-pointer.active {
+            transform: scale(1.5);
+            background: #fff;
+        }
+        #hand-pointer.pinch {
+            background: #00ff00;
+            box-shadow: 0 0 20px #00ff00;
+        }
+        #hand-pointer.fist {
+            background: #ff0000;
+            box-shadow: 0 0 20px #ff0000;
+        }
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
     <!-- Three.js -->
@@ -363,6 +388,7 @@
 
     <div id="canvas-container"></div>
     <video class="input_video"></video>
+    <div id="hand-pointer"></div>
 
     <div id="ui-layer">
         <div id="loader">
@@ -613,10 +639,19 @@ const inputManager = {
     camera: null,
 
     init: async function() {
+        console.log("正在初始化手势识别系统...");
+        document.getElementById('status-text').innerText = "正在启动星界感应系统...";
+        
         // MediaPipe Setup
-        this.hands = new Hands({locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-        }});
+        try {
+            this.hands = new Hands({locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+            }});
+        } catch (err) {
+            console.error("MediaPipe 库加载失败:", err);
+            document.getElementById('status-text').innerText = "库文件加载失败，请检查网络";
+            return;
+        }
         
         this.hands.setOptions({
             maxNumHands: 1,
@@ -720,56 +755,71 @@ const inputManager = {
                // this.videoElement.srcObject.getTracks().forEach(track => track.stop());
             }
         } else {
-            status.innerText = "手势模式: 张开=待机 | 捏合=抓取 | 握拳=确认";
+            status.innerText = "手势模式: 张开=移动 | 捏合=抓取 | 握拳=确认";
+            // 如果手势初始化还没完成，提示一下
+            if (!this.camera) {
+                status.innerText = "正在启动摄像头...";
+            }
         }
     },
 
     onHandsResults: function(results) {
         if (INTERACTION.mode !== 'hand') return;
 
+        const pointerEl = document.getElementById('hand-pointer');
+        
         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
             const landmarks = results.multiHandLandmarks[0];
             
             // 1. Calculate Pointer (Index Tip)
-            // MediaPipe x is 0-1 (left-right), y is 0-1 (top-bottom). Three.js needs -1 to 1.
-            // Also need to flip X because webcam is mirrored usually.
             const indexTip = landmarks[8];
-            INTERACTION.pointer.x = -((indexTip.x * 2) - 1); // Flip X
+            // MediaPipe x is 0-1, y is 0-1.
+            // On some mobile devices, we might need to NOT flip X if the browser already does it.
+            // But usually for mirrored front camera:
+            INTERACTION.pointer.x = -((indexTip.x * 2) - 1); 
             INTERACTION.pointer.y = -(indexTip.y * 2) + 1;
+
+            // Update Visual Pointer
+            pointerEl.style.display = 'block';
+            pointerEl.style.left = `${indexTip.x * 100}%`;
+            pointerEl.style.top = `${indexTip.y * 100}%`;
+            
+            // Mirror X for visual pointer if mirrored
+            pointerEl.style.left = `${(1 - indexTip.x) * 100}%`;
 
             // 2. Gesture Recognition
             this.recognizeGesture(landmarks);
             
-            // 3. Update Hand 3D Position Projection (Approximate depth)
-            // Using Z coordinate from landmarks (relative to wrist) isn't enough for absolute depth,
-            // so we map Y screen position to Z depth slightly for effect, but mainly use Raycaster.
+            // Update pointer visual state
+            pointerEl.className = INTERACTION.gesture.toLowerCase();
             
         } else {
             INTERACTION.gesture = 'NONE';
+            pointerEl.style.display = 'none';
         }
     },
 
     recognizeGesture: function(landmarks) {
+        const wrist = landmarks[0];
         const thumbTip = landmarks[4];
         const indexTip = landmarks[8];
         const middleTip = landmarks[12];
         const ringTip = landmarks[16];
         const pinkyTip = landmarks[20];
         
-        const thumbPip = landmarks[2];
         const indexPip = landmarks[6];
         const middlePip = landmarks[10];
         const ringPip = landmarks[14];
         const pinkyPip = landmarks[18];
 
-        // Distance between thumb and index tip
+        // 基础手掌大小参考 (腕部到中指根部的距离)
+        const middleMcp = landmarks[9];
+        const handSize = Math.hypot(wrist.x - middleMcp.x, wrist.y - middleMcp.y);
+
+        // Normalized distance between thumb and index tip
         const pinchDist = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
         INTERACTION.pinchDistance = pinchDist;
 
-        // Check if fingers are folded (Tip below PIP in y-axis context, but distance to wrist is safer)
-        // Simple check: Tip y > PIP y (screen coords, y increases downwards) means folded? 
-        // Better: Distance from wrist (0).
-        const wrist = landmarks[0];
         const isFingerExtended = (tip, pip) => {
             const dTip = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
             const dPip = Math.hypot(pip.x - wrist.x, pip.y - wrist.y);
@@ -781,31 +831,31 @@ const inputManager = {
         const rExt = isFingerExtended(ringTip, ringPip);
         const pExt = isFingerExtended(pinkyTip, pinkyPip);
 
-        // FIST: All fingers folded
+        // 1. FIST: All fingers folded relative to their PIPs
         if (!iExt && !mExt && !rExt && !pExt) {
             INTERACTION.gesture = 'FIST';
             return;
         }
 
-        // PINCH: Thumb close to index
-        if (pinchDist < 0.05) {
+        // 2. PINCH: Thumb very close to index tip relative to hand size
+        if (pinchDist < handSize * 0.4) {
             INTERACTION.gesture = 'PINCH';
             return;
         }
 
-        // OPEN: All extended
-        if (iExt && mExt && rExt && pExt) {
-            INTERACTION.gesture = 'OPEN';
-            return;
-        }
-        
-        // POINT: Index extended, others folded
+        // 3. POINT: Index extended, others folded
         if (iExt && !mExt && !rExt && !pExt) {
             INTERACTION.gesture = 'POINT';
             return;
         }
 
-        INTERACTION.gesture = 'OPEN'; // Default fallback
+        // 4. OPEN: Default if index is extended
+        if (iExt) {
+            INTERACTION.gesture = 'OPEN';
+            return;
+        }
+
+        INTERACTION.gesture = 'NONE';
     }
 };
 
