@@ -3,27 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>WebAR Tarot - Neo Logic</title>
-    <!-- Google Fonts: Inter & JetBrains Mono -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>WebAR Tarot - Celestial Oracle</title>
+    <!-- Google Fonts: Cinzel & Lato -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Lato:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0b0518;
-            --accent-color: #9d84ff; /* 魔法紫 */
+            --bg-color: #05081a;
+            --accent-color: #c5a059; /* 典雅金 */
             --highlight-color: #ffd700; /* 星星金 */
             --text-primary: #ffffff;
-            --text-secondary: #ccc0ff;
-            --panel-bg: rgba(25, 15, 50, 0.75);
-            --card-bg: rgba(40, 25, 80, 0.9);
-            --border-color: rgba(157, 132, 255, 0.4);
+            --text-secondary: #b0b8d1;
+            --panel-bg: rgba(10, 15, 40, 0.85);
+            --card-bg: rgba(15, 25, 60, 0.95);
+            --border-color: rgba(197, 160, 89, 0.4);
+            --glow-color: rgba(197, 160, 89, 0.2);
         }
 
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
-        body { background-color: var(--bg-color); font-family: 'Inter', sans-serif; user-select: none; color: var(--text-primary); }
+        body { background-color: var(--bg-color); font-family: 'Lato', sans-serif; user-select: none; color: var(--text-primary); }
         
         #canvas-container { 
             width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; 
-            background: radial-gradient(circle at 50% 50%, #1a103c 0%, #05020a 100%); 
+            background: radial-gradient(circle at 50% 50%, #0a1540 0%, #05081a 100%); 
         }
         
         /* 魔法星空背景微粒 (CSS 模拟) */
@@ -44,53 +45,56 @@
         /* Loader */
         #loader { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-family: 'JetBrains Mono', monospace; color: var(--highlight-color);
-            background: var(--panel-bg); padding: 30px 50px; 
-            border: 2px solid var(--accent-color); 
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 40px rgba(157, 132, 255, 0.2);
-            pointer-events: auto; text-transform: uppercase; letter-spacing: 2px;
+            font-family: 'Cinzel', serif; color: var(--accent-color);
+            background: var(--panel-bg); padding: 40px 60px; 
+            border: 1px solid var(--accent-color); 
+            border-radius: 4px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 50px rgba(197, 160, 89, 0.15), inset 0 0 20px rgba(197, 160, 89, 0.1);
+            pointer-events: auto; text-transform: uppercase; letter-spacing: 4px;
+            text-align: center;
         }
         
         /* Controls */
-        #controls { position: absolute; top: 30px; right: 30px; pointer-events: auto; display: flex; gap: 12px; }
+        #controls { position: absolute; top: 30px; right: 30px; pointer-events: auto; display: flex; gap: 15px; }
         .btn { 
-            background: var(--panel-bg);
-            backdrop-filter: blur(8px);
+            background: rgba(10, 20, 50, 0.6);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border-color); 
-            color: var(--text-secondary); 
-            padding: 10px 24px; 
+            color: var(--accent-color); 
+            padding: 12px 28px; 
             cursor: pointer; 
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 13px; 
-            border-radius: 30px; /* 圆角胶囊 */
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 14px; 
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .btn:hover { 
             border-color: var(--highlight-color);
             color: var(--highlight-color);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(157, 132, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(197, 160, 89, 0.25);
+            background: rgba(197, 160, 89, 0.1);
         }
         .btn.active { 
             background: var(--accent-color); 
-            color: #fff; 
+            color: #05081a; 
             border-color: var(--accent-color); 
-            box-shadow: 0 0 20px rgba(157, 132, 255, 0.5); 
+            box-shadow: 0 0 25px rgba(197, 160, 89, 0.4); 
         }
 
         /* History Panel */
         #history-panel { 
             position: absolute; top: 30px; left: 30px; 
-            width: 300px; max-height: 80vh; 
+            width: 320px; max-height: 80vh; 
             overflow-y: hidden; 
             pointer-events: auto; 
             display: flex; flex-direction: column;
-            gap: 12px;
+            gap: 15px;
         }
 
         /* Reading Panel */
@@ -98,154 +102,221 @@
             position: absolute;
             top: 30px;
             right: 30px;
-            width: 340px;
-            max-height: 80vh;
+            width: 380px;
+            max-height: 85vh;
             pointer-events: auto;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.45);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(145deg, rgba(15, 25, 60, 0.98), rgba(5, 10, 30, 0.99));
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 0 30px rgba(197, 160, 89, 0.05);
+            backdrop-filter: blur(20px);
             overflow: hidden;
             transform: translateY(0);
             opacity: 1;
-            transition: opacity 0.25s ease, transform 0.25s ease;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         }
         .reading-panel.hidden{
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(20px);
             pointer-events: none;
         }
         .reading-header{
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
-            padding: 14px 14px 10px 14px;
-            border-bottom: 1px solid rgba(157, 132, 255, 0.18);
-            background: linear-gradient(180deg, rgba(157,132,255,0.12), transparent);
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+            background: rgba(197, 160, 89, 0.05);
         }
         .reading-title #reading-name{
-            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
             color: var(--highlight-color);
-            letter-spacing: 0.4px;
-            font-size: 15px;
-            text-shadow: 0 0 12px rgba(255,215,0,0.22);
+            letter-spacing: 2px;
+            font-size: 20px;
+            text-shadow: 0 0 15px rgba(255,215,0,0.3);
         }
         .reading-orientation{
             margin-top: 4px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            opacity: 0.9;
+            font-size: 13px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .reading-actions{
             display: flex;
-            gap: 12px;
+            gap: 15px;
         }
         .btn.btn-mini{
-            padding: 10px 18px; /* Slightly larger for touch */
-            font-size: 13px;
+            padding: 8px 16px;
+            font-size: 12px;
         }
         .reading-body{
-            padding: 12px 14px 14px 14px;
+            padding: 24px;
             color: var(--text-secondary);
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 15px;
+            line-height: 1.8;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            max-height: calc(80vh - 58px);
+            max-height: calc(85vh - 80px);
         }
         .reading-body h4{
-            margin: 10px 0 6px 0;
-            font-size: 12px;
-            color: #fff;
-            letter-spacing: 0.8px;
+            font-family: 'Cinzel', serif;
+            margin: 24px 0 12px 0;
+            font-size: 14px;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+            text-align: center;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+            padding-bottom: 10px;
             text-transform: uppercase;
-            opacity: 0.95;
         }
         .reading-body p{
-            margin: 0 0 10px 0;
+            margin: 0 0 15px 0;
+            text-align: justify;
         }
         .reading-chip{
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(157,132,255,0.35);
-            background: rgba(157,132,255,0.10);
-            color: #fff;
-            font-size: 12px;
-            margin: 0 8px 10px 0;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 2px;
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            background: rgba(197, 160, 89, 0.08);
+            color: var(--accent-color);
+            font-size: 11px;
+            margin: 0 10px 15px 0;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
         }
 
         /* AI Reading Section Styles */
         .ai-header {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border-color);
+            margin-top: 30px;
+            padding: 12px 15px;
+            border: 1px solid var(--accent-color);
+            border-bottom: none;
             color: var(--highlight-color);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            letter-spacing: 1px;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 2px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 10px;
+            background: rgba(197, 160, 89, 0.1);
+            border-radius: 4px 4px 0 0;
         }
         .ai-content {
-            font-size: 14px;
-            line-height: 1.7;
-            color: #e0d5ff;
-            background: rgba(157, 132, 255, 0.05);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(157, 132, 255, 0.1);
+            font-size: 15px;
+            line-height: 1.8;
+            color: #d0d8ff;
+            background: rgba(5, 10, 30, 0.8);
+            padding: 20px;
+            border-radius: 0 0 4px 4px;
+            border: 1px solid var(--accent-color);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            font-family: 'Lato', sans-serif;
         }
-        .loading-dots:after {
-            content: '...';
-            animation: dots 1.5s steps(5, end) infinite;
+
+        /* AI Context (Prompt Variables) */
+        .ai-context{
+            margin-top: 18px;
+            padding: 14px;
+            border: 1px solid rgba(197, 160, 89, 0.25);
+            background: rgba(197, 160, 89, 0.06);
         }
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80% { content: '...'; }
+        .ai-context-title{
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--accent-color);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display:flex;
+            align-items:center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .ai-fields{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .ai-field{
+            display:flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .ai-label{
+            font-size: 11px;
+            color: rgba(255, 215, 0, 0.8);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ai-input, .ai-select{
+            background: rgba(5, 10, 30, 0.85);
+            border: 1px solid rgba(197, 160, 89, 0.35);
+            color: #e6edff;
+            border-radius: 2px;
+            padding: 10px 10px;
+            outline: none;
+            font-size: 13px;
+            font-family: 'Lato', sans-serif;
+        }
+        .ai-input{
+            min-height: 64px;
+            resize: vertical;
+            grid-column: 1 / -1;
+        }
+        .btn.btn-mini.btn-ghost{
+            background: rgba(5, 10, 30, 0.25);
+            border-color: rgba(197, 160, 89, 0.35);
+            color: var(--highlight-color);
+        }
+        .btn.btn-mini.btn-ghost:hover{
+            background: rgba(197, 160, 89, 0.16);
         }
         
         .history-item { 
-            background: var(--card-bg);
+            background: linear-gradient(135deg, rgba(15, 25, 60, 0.9), rgba(5, 10, 30, 0.95));
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px; 
-            animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 2px;
+            padding: 18px; 
+            animation: slideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
             cursor: pointer;
         }
         .history-item:hover {
             transform: scale(1.02);
             border-color: var(--highlight-color);
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
+            background: rgba(197, 160, 89, 0.05);
         }
 
         .history-name { 
             color: var(--highlight-color); 
-            font-weight: 700; font-size: 15px; 
-            letter-spacing: 0.5px; margin-bottom: 6px; 
+            font-family: 'Cinzel', serif;
+            font-weight: 700; font-size: 16px; 
+            letter-spacing: 1px; margin-bottom: 6px; 
             display: flex; justify-content: space-between;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
         }
-        .history-meaning { color: var(--text-secondary); font-size: 13px; line-height: 1.5; font-weight: 300; }
+        .history-meaning { color: var(--text-secondary); font-size: 13px; line-height: 1.6; font-weight: 400; }
         .reversed-tag { 
             color: #ff6b6b; 
             background: rgba(255, 107, 107, 0.1);
             font-size: 10px; 
             border: 1px solid #ff6b6b; 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            margin-left: 8px; 
+            padding: 2px 8px; 
+            border-radius: 2px; 
+            margin-left: 10px; 
             vertical-align: middle;
+            font-family: 'Cinzel', serif;
         }
 
         /* Status & Charge */
@@ -256,16 +327,17 @@
         }
         #status-text { 
             color: #fff; 
-            font-family: 'Inter', sans-serif; 
-            font-weight: 500;
-            font-size: 15px; 
-            letter-spacing: 1px;
-            background: rgba(40, 25, 80, 0.85);
-            padding: 12px 30px;
-            border-radius: 50px;
+            font-family: 'Cinzel', serif; 
+            font-weight: 700;
+            font-size: 16px; 
+            letter-spacing: 2px;
+            background: rgba(10, 15, 40, 0.9);
+            padding: 14px 35px;
+            border-radius: 4px;
             border: 1px solid var(--accent-color);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 20px rgba(157, 132, 255, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(197, 160, 89, 0.2);
+            text-transform: uppercase;
         }
         
         #charge-bar-container {
@@ -285,18 +357,25 @@
 
         /* Mobile Optimization */
         @media (max-width: 768px) {
+            :root{
+                --safe-top: env(safe-area-inset-top, 0px);
+                --safe-bottom: env(safe-area-inset-bottom, 0px);
+            }
             #history-panel { 
                 top: auto; bottom: 0; left: 0; 
-                width: 100%; height: 160px; 
+                width: 100%; height: 140px; 
                 max-height: 25vh; 
                 flex-direction: row; 
                 overflow-x: auto; 
                 overflow-y: hidden;
                 background: linear-gradient(to top, rgba(11, 5, 24, 0.95), transparent); 
-                padding: 15px; 
+                padding: 12px; 
                 box-sizing: border-box; 
                 gap: 15px;
                 scrollbar-width: none; /* Hide scrollbar Firefox */
+                overscroll-behavior: contain;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: calc(12px + var(--safe-bottom));
             }
             #history-panel::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
 
@@ -314,25 +393,39 @@
             .history-name { font-size: 13px; margin-bottom: 4px; }
             .history-meaning { 
                 display: -webkit-box;
+                line-clamp: 3;
                 -webkit-line-clamp: 3;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 font-size: 11px;
             }
 
-            #controls { top: 10px; right: 10px; gap: 8px; }
-            .btn { padding: 8px 16px; font-size: 12px; }
+            #controls { 
+                top: calc(10px + var(--safe-top)); 
+                left: 10px;
+                right: 10px; 
+                gap: 8px; 
+                justify-content: space-between;
+            }
+            .btn { 
+                padding: 10px 12px; 
+                font-size: 12px; 
+                flex: 1;
+                text-align: center;
+            }
 
-            #status-container { bottom: 180px; } 
+            #status-container { bottom: calc(160px + var(--safe-bottom)); } 
             #status-text { font-size: 13px; padding: 10px 20px; }
 
             .reading-panel {
                 left: 0; right: 0; top: auto; bottom: 0;
-                width: 100%; height: 75vh;
-                max-height: 75vh;
+                width: 100%; height: min(78dvh, 78vh);
+                max-height: min(78dvh, 78vh);
                 border-radius: 24px 24px 0 0;
                 transform: translateY(100%);
                 z-index: 1000;
+                display: flex;
+                flex-direction: column;
             }
             .reading-panel.hidden {
                 transform: translateY(100%);
@@ -341,11 +434,34 @@
             .reading-panel:not(.hidden) {
                 transform: translateY(0);
             }
+            .reading-header{
+                position: sticky;
+                top: 0;
+                z-index: 2;
+                padding: 14px 16px;
+                backdrop-filter: blur(18px);
+                flex: 0 0 auto;
+            }
             .reading-body {
-                max-height: calc(75vh - 70px);
-                padding-bottom: 40px;
+                max-height: none;
+                flex: 1 1 auto;
+                min-height: 0; /* critical: allow inner scrolling inside flex container */
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+                padding: 14px 16px calc(18px + var(--safe-bottom)) 16px;
             }
             .ai-content { font-size: 13px; padding: 12px; }
+
+            /* AI context form: single column + compact */
+            .ai-context{ padding: 12px; }
+            .ai-context-title{ 
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .ai-fields{ grid-template-columns: 1fr; }
+            .ai-input{ min-height: 56px; }
         }
         
         /* Hand Pointer */
@@ -458,7 +574,7 @@ const TAROT_DATA = [
     { id: 'world', name: 'The World (世界)', url: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg', upright: '完成、整合、旅行', reversed: '未完成、缺乏闭环' }
 ];
 
-// 魔法风格卡背纹理 (参考图片风格 - 矢量扁平)
+// ================= 极简线条卡背纹理 (No Glow) =================
 function createMagicalBackTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
@@ -467,87 +583,208 @@ function createMagicalBackTexture() {
     const w = canvas.width;
     const h = canvas.height;
 
-    // 1. 背景：魔法深紫渐变
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, '#35225e'); // 亮紫
-    grad.addColorStop(0.5, '#1a103c'); // 深蓝紫
-    grad.addColorStop(1, '#35225e');
+    // 1. 背景：深邃星空 + 极光纹理
+    const grad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, h/0.8);
+    grad.addColorStop(0, '#0a1a50');
+    grad.addColorStop(0.5, '#05081a');
+    grad.addColorStop(1, '#020308');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
 
-    // 2. 装饰图案
+    // 添加一层淡淡的星云感
+    for(let i=0; i<3; i++) {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        const r = 200 + Math.random() * 200;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+        g.addColorStop(0, `rgba(100, 100, 255, 0.05)`);
+        g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+    }
+
+    // 1.5 精致无缝纹理 (Subtle Seamless Pattern)
+    const patSize = 64;
+    const patCanvas = document.createElement('canvas');
+    patCanvas.width = patSize;
+    patCanvas.height = patSize;
+    const pCtx = patCanvas.getContext('2d');
+
+    // 绘制古典菱格纹
+    pCtx.lineWidth = 1;
+    pCtx.strokeStyle = 'rgba(197, 160, 89, 0.05)'; // 极淡
+
+    // 菱形
+    pCtx.beginPath();
+    pCtx.moveTo(patSize/2, 0);
+    pCtx.lineTo(patSize, patSize/2);
+    pCtx.lineTo(patSize/2, patSize);
+    pCtx.lineTo(0, patSize/2);
+    pCtx.closePath();
+    pCtx.stroke();
+
+    // 中心十字星
+    pCtx.beginPath();
+    pCtx.moveTo(patSize/2 - 5, patSize/2); pCtx.lineTo(patSize/2 + 5, patSize/2);
+    pCtx.moveTo(patSize/2, patSize/2 - 5); pCtx.lineTo(patSize/2, patSize/2 + 5);
+    pCtx.stroke();
+
+    // 交叉点装饰
+    pCtx.fillStyle = 'rgba(197, 160, 89, 0.08)';
+    pCtx.beginPath();
+    pCtx.arc(0, 0, 2, 0, Math.PI*2);
+    pCtx.arc(patSize, 0, 2, 0, Math.PI*2);
+    pCtx.arc(0, patSize, 2, 0, Math.PI*2);
+    pCtx.arc(patSize, patSize, 2, 0, Math.PI*2);
+    pCtx.fill();
+
+    const pattern = ctx.createPattern(patCanvas, 'repeat');
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0, 0, w, h);
+
+    // 2. 华丽多重边框
+    // 最外层金属边
+    ctx.strokeStyle = '#c5a059';
+    ctx.lineWidth = 14;
+    ctx.strokeRect(7, 7, w-14, h-14);
+    
+    // 内层细金线
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(25, 25, w-50, h-50);
+    ctx.strokeRect(35, 35, w-70, h-70);
+
+    // 四角装饰花纹
+    const drawCorner = (cx, cy, rotation) => {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rotation);
+        
+        ctx.beginPath();
+        // 菱形装饰
+        ctx.moveTo(0, 0);
+        ctx.lineTo(15, -15);
+        ctx.lineTo(30, 0);
+        ctx.lineTo(15, 15);
+        ctx.closePath();
+        
+        // 两侧线条
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-20, 0);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -20);
+        
+        ctx.strokeStyle = 'rgba(197, 160, 89, 0.6)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        
+        // 内部填充点
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(15, 0, 2, 0, Math.PI*2);
+        ctx.fill();
+        
+        ctx.restore();
+    };
+
+    drawCorner(50, 50, 0);
+    drawCorner(w-50, 50, Math.PI/2);
+    drawCorner(w-50, h-50, Math.PI);
+    drawCorner(50, h-50, -Math.PI/2);
+
+    // 边缘中间装饰
+    const drawSideDeco = (x, y, vertical) => {
+        ctx.save();
+        ctx.translate(x, y);
+        if(vertical) ctx.rotate(Math.PI/2);
+        
+        ctx.beginPath();
+        ctx.arc(0, 0, 3, 0, Math.PI*2);
+        ctx.moveTo(-10, 0); ctx.lineTo(-25, 0);
+        ctx.moveTo(10, 0); ctx.lineTo(25, 0);
+        
+        ctx.strokeStyle = 'rgba(197, 160, 89, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fill(); // 金点
+        ctx.restore();
+    };
+    
+    drawSideDeco(w/2, 42, false);  // Top
+    drawSideDeco(w/2, h-42, false); // Bottom
+    drawSideDeco(42, h/2, true);   // Left
+    drawSideDeco(w-42, h/2, true);  // Right
+
+    // 3. 核心装饰区 (居中)
     ctx.translate(w/2, h/2);
     
-    // 背景几何线条
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, 0, 180, 0, Math.PI*2);
-    ctx.stroke();
+    // 3.1 核心发光感
+    const sunGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 250);
+    sunGrad.addColorStop(0, 'rgba(197, 160, 89, 0.25)');
+    sunGrad.addColorStop(0.5, 'rgba(197, 160, 89, 0.05)');
+    sunGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = sunGrad;
+    ctx.beginPath(); ctx.arc(0, 0, 250, 0, Math.PI*2); ctx.fill();
+
+    // 3.2 24点华丽星轮
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 1.5;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#ffd700'; // 给线条增加发光
+    for (let i = 0; i < 24; i++) {
+        ctx.rotate(Math.PI / 12);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, i % 6 === 0 ? 220 : (i % 2 === 0 ? 170 : 120));
+        ctx.stroke();
+    }
+    ctx.shadowBlur = 0; // 重置阴影以免影响后续
     
-    // 旋转正方形框
-    ctx.strokeStyle = 'rgba(176, 160, 255, 0.3)';
-    ctx.strokeRect(-140, -140, 280, 280);
+    // 3.3 装饰性刻度圆环
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(0, 0, 85, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([8, 12]);
+    ctx.beginPath(); ctx.arc(0, 0, 110, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // 3.4 月亮与核心 (极亮模式)
     ctx.save();
-    ctx.rotate(Math.PI/4);
-    ctx.strokeRect(-140, -140, 280, 280);
+    ctx.rotate(Math.PI / 4);
+    ctx.shadowBlur = 40; // 核心超强发光
+    ctx.shadowColor = '#fff0a0';
+    ctx.fillStyle = '#ffffff'; // 核心改为纯白
+    ctx.beginPath();
+    ctx.arc(0, 0, 45, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(20, -8, 45, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
 
-    // 3. 核心图案：太阳/星星 (强发光)
-    ctx.shadowBlur = 40;
-    ctx.shadowColor = '#e0c0ff'; // 紫白光晕
-    
-    // 主体八角星
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    for(let i=0; i<16; i++) {
-        const r = i%2===0 ? 110 : 40; // 长短光芒
-        const angle = i * Math.PI / 8;
-        const x = Math.cos(angle) * r;
-        const y = Math.sin(angle) * r;
-        if(i===0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.fill();
-    
-    // 内部镂空圆
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#1a103c'; 
-    ctx.beginPath();
-    ctx.arc(0, 0, 25, 0, Math.PI*2);
-    ctx.fill();
-    
-    // 内部小星
-    ctx.fillStyle = '#b0a0ff';
-    ctx.beginPath();
-    for(let i=0; i<8; i++) {
-        const r = i%2===0 ? 20 : 10;
-        const angle = i * Math.PI / 4;
-        const x = Math.cos(angle) * r;
-        const y = Math.sin(angle) * r;
-        if(i===0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    }
-    ctx.fill();
-
-    // 4. 边框
+    // 4. 星座连线 (淡淡的装饰背景)
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = '#b0a0ff';
-    ctx.strokeStyle = '#b0a0ff';
-    ctx.lineWidth = 8;
-    ctx.strokeRect(20, 20, w-40, h-40);
-    
-    // 角落花纹装饰
-    const drawCorner = (x, y) => {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(x-5, y-5, 10, 10);
-    };
-    drawCorner(20, 20);
-    drawCorner(w-20, 20);
-    drawCorner(20, h-20);
-    drawCorner(w-20, h-20);
+    ctx.strokeStyle = 'rgba(197, 160, 89, 0.15)';
+    ctx.lineWidth = 0.5;
+    const pts = [[100, 200], [150, 250], [80, 320], [200, 400], [400, 150], [350, 700], [120, 800]];
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+        if(i===0) ctx.moveTo(p[0], p[1]);
+        else ctx.lineTo(p[0], p[1]);
+        ctx.arc(p[0], p[1], 2, 0, Math.PI*2);
+    });
+    ctx.stroke();
+
+    // 5. 高亮星尘
+    for (let i = 0; i < 200; i++) {
+        const size = Math.random() * 1.5;
+        const alpha = Math.random() * 0.6 + 0.2;
+        ctx.fillStyle = `rgba(255, 255, 200, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(Math.random() * w, Math.random() * h, size, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -576,29 +813,42 @@ const MagicCardShader = {
         varying vec3 vPosition;
 
         void main() {
-            // 1. 采样原图 (移除白边: 稍微缩放 UV)
-            vec2 uv = (vUv - 0.5) * 0.92 + 0.5; 
+            // 1. 采样原图 (移除白边)
+            vec2 uv = (vUv - 0.5) * 0.94 + 0.5; 
             vec4 tex = texture2D(map, uv);
             
-            // 2. 计算亮度 (Luminance)
+            // 2. 极高对比度映射
             float gray = dot(tex.rgb, vec3(0.299, 0.587, 0.114));
+            float contrast = smoothstep(0.05, 0.85, gray);
             
-            // 3. 增加对比度，使图案更清晰
-            float contrast = smoothstep(0.2, 0.7, gray);
+            // 3. 极光/圣光配色
+            vec3 deepBlue = vec3(0.02, 0.05, 0.2);
+            vec3 goldBase = vec3(1.2, 0.95, 0.4); // 超过 1.0 以产生过曝感
+            vec3 finalColor = mix(deepBlue, goldBase, contrast);
             
-            // 4. 紫金双色调映射 (Duotone Mapping)
-            // 暗部 -> 深紫, 亮部 -> 金色
-            vec3 finalColor = mix(colorDark, colorLight, contrast);
+            // 4. 动态虹彩增强
+            float hueShift = sin(vUv.x * 6.0 + vUv.y * 4.0 + time * 2.0) * 0.5 + 0.5;
+            vec3 rainbow = vec3(
+                0.5 + 0.5 * cos(6.28 * (hueShift + 0.0)),
+                0.5 + 0.5 * cos(6.28 * (hueShift + 0.33)),
+                0.5 + 0.5 * cos(6.28 * (hueShift + 0.67))
+            );
             
-            // 5. 动态流光效果 (Shimmer)
-            // 基于位置和时间的斜向光波
-            float shimmer = sin(vUv.y * 10.0 + vUv.x * 10.0 - time * 2.0) * 0.5 + 0.5;
-            // 仅在亮部(金色区域)应用流光
-            finalColor += colorAccent * shimmer * contrast * 0.3;
+            // 5. 极强流光 (Super Streak)
+            float shimmer = sin(vUv.x * 5.0 + vUv.y * 2.0 + time * 3.0) * 0.5 + 0.5;
+            float streak = pow(shimmer, 8.0) * 1.5; // 强度增加
+            
+            finalColor += rainbow * streak * contrast * 0.6;
+            finalColor += vec3(1.0, 0.8, 0.3) * streak * contrast;
 
-            // 6. 边缘暗角 (Vignette)
+            // 6. 核心星钻闪烁 (Diamond Sparkle)
+            float glint = pow(max(0.0, sin(vUv.x * 25.0 + time * 2.0) * sin(vUv.y * 25.0 - time * 2.0)), 30.0);
+            finalColor += vec3(1.0, 1.0, 0.9) * glint * contrast * 3.0;
+
+            // 7. 边缘圣光
             float dist = distance(vUv, vec2(0.5));
-            finalColor *= smoothstep(0.8, 0.3, dist);
+            float glow = pow(dist, 3.5) * (0.4 + 0.15 * sin(time * 3.0));
+            finalColor += vec3(0.8, 0.7, 1.0) * glow;
 
             gl_FragColor = vec4(finalColor, 1.0);
         }
@@ -626,9 +876,9 @@ const INTERACTION = {
     state: 'INTRO', // 'INTRO', 'IDLE', 'HOVER', 'GRABBED', 'LOCKED'
     raycaster: new THREE.Raycaster(),
     pointer: new THREE.Vector2(), 
+    targetPointer: new THREE.Vector2(), // 目标位置，用于平滑插值
     gesture: 'NONE', 
     handPosition: new THREE.Vector3(),
-    pinchDistance: 0,
     fistStartTime: 0 
 };
 
@@ -637,6 +887,7 @@ const inputManager = {
     videoElement: document.querySelector('.input_video'),
     hands: null,
     camera: null,
+    _cameraStarting: false,
 
     init: async function() {
         console.log("正在初始化手势识别系统...");
@@ -662,33 +913,14 @@ const inputManager = {
 
         this.hands.onResults(this.onHandsResults.bind(this));
 
-        // 尝试启动摄像头
-        try {
-            let lastVideoTime = 0;
-            const fpsInterval = 1000 / 20; // 限制手势识别为 20 FPS
-
-            this.camera = new Camera(this.videoElement, {
-                onFrame: async () => {
-                    const now = Date.now();
-                    if (now - lastVideoTime < fpsInterval) return;
-                    lastVideoTime = now;
-                    await this.hands.send({image: this.videoElement});
-                },
-                width: 320, // 降低处理分辨率提高性能
-                height: 240
-            });
-            await this.camera.start();
-            this.setMode('hand');
-        } catch (e) {
-            console.warn("Camera failed, fallback to mouse", e);
-            document.getElementById('status-text').innerText = "摄像头不可用，已切换至鼠标模式";
-            this.setMode('mouse');
-        }
+        // 尝试启动摄像头（先检查设备，避免 camera_utils 在无摄像头时抛 NotFoundError）
+        const ok = await this.startCamera();
+        this.setMode(ok ? 'hand' : 'mouse');
 
         // Mouse Listeners
         const updatePointer = (clientX, clientY) => {
-            INTERACTION.pointer.x = (clientX / window.innerWidth) * 2 - 1;
-            INTERACTION.pointer.y = -(clientY / window.innerHeight) * 2 + 1;
+            INTERACTION.targetPointer.x = (clientX / window.innerWidth) * 2 - 1;
+            INTERACTION.targetPointer.y = -(clientY / window.innerHeight) * 2 + 1;
         };
 
         window.addEventListener('mousemove', (e) => {
@@ -742,6 +974,49 @@ const inputManager = {
         });
     },
 
+    startCamera: async function() {
+        if (this._cameraStarting) return false;
+        this._cameraStarting = true;
+        try {
+            // 设备预检：没有 videoinput 就直接降级，不触发 camera_utils 的 NotFoundError log
+            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                throw new Error("NO_MEDIA_DEVICES");
+            }
+            const devices = await navigator.mediaDevices.enumerateDevices().catch(() => []);
+            const hasVideoInput = devices.some(d => d && d.kind === 'videoinput');
+            if (!hasVideoInput) {
+                throw new Error("NO_CAMERA_DEVICE");
+            }
+
+            let lastVideoTime = 0;
+            const fpsInterval = 1000 / 20; // 限制手势识别为 20 FPS
+
+            this.camera = new Camera(this.videoElement, {
+                onFrame: async () => {
+                    const now = Date.now();
+                    if (now - lastVideoTime < fpsInterval) return;
+                    lastVideoTime = now;
+                    await this.hands.send({ image: this.videoElement });
+                },
+                width: 320,
+                height: 240
+            });
+            await this.camera.start();
+            return true;
+        } catch (e) {
+            console.warn("摄像头启动失败，已降级鼠标模式：", e);
+            const status = document.getElementById('status-text');
+            if (String(e?.message || "").includes("NO_CAMERA_DEVICE")) {
+                status.innerText = "未检测到摄像头设备，已切换至鼠标模式";
+            } else {
+                status.innerText = "摄像头不可用/被阻止，已切换至鼠标模式";
+            }
+            return false;
+        } finally {
+            this._cameraStarting = false;
+        }
+    },
+
     setMode: function(mode) {
         INTERACTION.mode = mode;
         document.getElementById('btn-mouse').className = mode === 'mouse' ? 'btn active' : 'btn';
@@ -756,9 +1031,12 @@ const inputManager = {
             }
         } else {
             status.innerText = "手势模式: 张开=移动 | 捏合=抓取 | 握拳=确认";
-            // 如果手势初始化还没完成，提示一下
+            // 若之前降级过，切回手势时尝试重试摄像头
             if (!this.camera) {
                 status.innerText = "正在启动摄像头...";
+                this.startCamera().then(ok => {
+                    if (!ok) this.setMode('mouse');
+                });
             }
         }
     },
@@ -771,21 +1049,16 @@ const inputManager = {
         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
             const landmarks = results.multiHandLandmarks[0];
             
-            // 1. Calculate Pointer (Index Tip)
+            // 1. Calculate Target Pointer (Index Tip)
             const indexTip = landmarks[8];
-            // MediaPipe x is 0-1, y is 0-1.
-            // On some mobile devices, we might need to NOT flip X if the browser already does it.
-            // But usually for mirrored front camera:
-            INTERACTION.pointer.x = -((indexTip.x * 2) - 1); 
-            INTERACTION.pointer.y = -(indexTip.y * 2) + 1;
+            // 使用 targetPointer 存储原始数据，在 animate 中平滑处理
+            INTERACTION.targetPointer.x = -((indexTip.x * 2) - 1); 
+            INTERACTION.targetPointer.y = -(indexTip.y * 2) + 1;
 
-            // Update Visual Pointer
+            // Update Visual Pointer (DOM updates are expensive, keep them minimal)
             pointerEl.style.display = 'block';
-            pointerEl.style.left = `${indexTip.x * 100}%`;
-            pointerEl.style.top = `${indexTip.y * 100}%`;
-            
-            // Mirror X for visual pointer if mirrored
             pointerEl.style.left = `${(1 - indexTip.x) * 100}%`;
+            pointerEl.style.top = `${indexTip.y * 100}%`;
 
             // 2. Gesture Recognition
             this.recognizeGesture(landmarks);
@@ -818,7 +1091,6 @@ const inputManager = {
 
         // Normalized distance between thumb and index tip
         const pinchDist = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
-        INTERACTION.pinchDistance = pinchDist;
 
         const isFingerExtended = (tip, pip) => {
             const dTip = Math.hypot(tip.x - wrist.x, tip.y - wrist.y);
@@ -843,13 +1115,7 @@ const inputManager = {
             return;
         }
 
-        // 3. POINT: Index extended, others folded
-        if (iExt && !mExt && !rExt && !pExt) {
-            INTERACTION.gesture = 'POINT';
-            return;
-        }
-
-        // 4. OPEN: Default if index is extended
+        // 3. OPEN: Default if index is extended
         if (iExt) {
             INTERACTION.gesture = 'OPEN';
             return;
@@ -873,43 +1139,37 @@ function initScene() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0x404040, 1.5); // 增加环境光以显示插画颜色
-    scene.add(ambientLight);
+    // Lights removed
 
-    // Dramatic SpotLight
-    const spotLight = new THREE.SpotLight(0xffffff, 1.5);
-    spotLight.position.set(0, 5, 8);
-    spotLight.angle = Math.PI / 3;
-    spotLight.penumbra = 0.5;
-    spotLight.distance = 30;
-    scene.add(spotLight);
-
-    // Dynamic point light following card
-    const pointLight = new THREE.PointLight(0xb0a0ff, 0, 10); // 紫色光
-    scene.add(pointLight);
-    scene.userData.pointLight = pointLight;
+    // 星空背景 (Stars)
+    addStarField();
 
     // Generate Textures
     const magicalTex = createMagicalBackTexture();
     globalMaterials = {
-        back: new THREE.MeshStandardMaterial({ 
-            map: magicalTex, 
-            roughness: 0.4, 
-            metalness: 0.1, // 非金属
-            emissive: 0x222222, // 稍微自发光
-            emissiveMap: magicalTex,
-            emissiveIntensity: 0.5
+        back: new THREE.MeshBasicMaterial({
+            map: magicalTex
         }),
-        side: new THREE.MeshStandardMaterial({ 
-            color: 0x35225e, 
-            emissive: 0x1a103c,
+        side: new THREE.MeshBasicMaterial({
+            color: 0x0a1540
         })
     };
+
+    // 4. Background Aura (Persistent)
+    const auraMesh = createAuraMesh();
+    scene.add(auraMesh);
+    scene.userData.aura = auraMesh;
 
     // Start with Intro Deck
     spawnDeckIntro();
     
+    // 3D Background Decor: Zodiac Wheel
+    const zodiacWheel = createZodiacWheel();
+    zodiacWheel.position.set(0, -3.5, -5);
+    zodiacWheel.rotation.x = -Math.PI / 2.2;
+    scene.add(zodiacWheel);
+    scene.userData.zodiacWheel = zodiacWheel;
+
     // Hide loader
     document.getElementById('loader').style.opacity = 0;
     setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
@@ -917,18 +1177,132 @@ function initScene() {
     animate();
 }
 
+function createAuraMesh() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    grad.addColorStop(0, 'rgba(197, 160, 89, 0.6)');
+    grad.addColorStop(0.4, 'rgba(157, 132, 255, 0.2)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 256);
+    
+    const tex = new THREE.CanvasTexture(canvas);
+    const geometry = new THREE.PlaneGeometry(8, 8);
+    const material = new THREE.MeshBasicMaterial({ 
+        map: tex, 
+        transparent: true, 
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+    });
+    return new THREE.Mesh(geometry, material);
+}
+
+function updateAura(time) {
+    if (!scene.userData.aura) return;
+    const aura = scene.userData.aura;
+    
+    if (cardMesh && INTERACTION.state !== 'INTRO') {
+        aura.visible = true;
+        aura.position.copy(cardMesh.position);
+        aura.position.z -= 0.1; // Place slightly behind
+        const s = 1.2 + Math.sin(time * 2.0) * 0.1;
+        aura.scale.set(s, s, 1);
+        aura.material.opacity = 0.5 + Math.sin(time * 3.0) * 0.2;
+    } else {
+        aura.visible = false;
+    }
+}
+
+function createZodiacWheel() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 1024;
+    const ctx = canvas.getContext('2d');
+    const center = 512;
+    
+    ctx.strokeStyle = '#c5a059';
+    ctx.lineWidth = 2;
+    
+    // Outer Rings
+    for(let r of [500, 485, 410]) {
+        ctx.beginPath();
+        ctx.arc(center, center, r, 0, Math.PI*2);
+        ctx.stroke();
+    }
+    
+    // Zodiac Lines
+    for(let i=0; i<12; i++) {
+        const angle = (i/12) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(center + Math.cos(angle)*410, center + Math.sin(angle)*410);
+        ctx.lineTo(center + Math.cos(angle)*500, center + Math.sin(angle)*500);
+        ctx.stroke();
+    }
+
+    // Inner Decorative Pattern (Star Spokes)
+    ctx.lineWidth = 1;
+    for(let i=0; i<36; i++) {
+        const angle = (i/36) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.lineTo(center + Math.cos(angle)*390, center + Math.sin(angle)*390);
+        ctx.strokeStyle = `rgba(197, 160, 89, 0.2)`;
+        ctx.stroke();
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    const geometry = new THREE.PlaneGeometry(35, 35);
+    const material = new THREE.MeshBasicMaterial({ 
+        map: tex, 
+        transparent: true, 
+        opacity: 0.3,
+        side: THREE.DoubleSide,
+        depthWrite: false
+    });
+    return new THREE.Mesh(geometry, material);
+}
+
+function addStarField() {
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 1000;
+    const pos = new Float32Array(starCount * 3);
+    for(let i=0; i<starCount*3; i++) {
+        pos[i] = (Math.random() - 0.5) * 100; // Large spread
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const starMat = new THREE.PointsMaterial({color: 0xffffff, size: 0.1, transparent: true, opacity: 0.8});
+    const stars = new THREE.Points(starGeo, starMat);
+    scene.add(stars);
+}
+
+// ================= 牌阵逻辑 (动态数量版) =================
 function spawnDeckIntro() {
     INTERACTION.state = 'INTRO';
-    document.getElementById('status-text').innerText = "请从牌阵中感应并选择一张";
+    isProcessingEffect = false; // 重置标识位，允许交互
     
-    // Exactly 5 cards as requested
-    const count = 5;
-    const radius = 6; 
-    const arcAngle = Math.PI * 0.4; 
+    if (deck.length === 0) {
+        document.getElementById('status-text').innerText = "牌库已空，命运已定。";
+        return;
+    }
+
+    document.getElementById('status-text').innerText = "滑动星河，感应你的下一次命运之牌";
+
+    // 容器 Group，置于摄像机位置，形成包围感
+    const deckGroup = new THREE.Group();
+    deckGroup.position.copy(camera.position); 
+    // 统一高度偏移
+    deckGroup.position.y -= 0.5; 
+    scene.add(deckGroup);
+    scene.userData.deckGroup = deckGroup;
     
-    const geometry = new THREE.BoxGeometry(1.5, 2.6, 0.02);
+    // 剩余牌数，最多显示22张
+    const count = Math.min(deck.length, 22); 
+    const radius = 7.5; // 增加半径以加宽间距
     
-    // Apply materials
+    const geometry = new THREE.BoxGeometry(1.2, 2.1, 0.02);
     const materials = [
         globalMaterials.side, globalMaterials.side, 
         globalMaterials.side, globalMaterials.side, 
@@ -938,26 +1312,25 @@ function spawnDeckIntro() {
     for (let i = 0; i < count; i++) {
         const mesh = new THREE.Mesh(geometry, materials);
         
-        // Arc positioning centered
-        const t = (i - (count-1)/2) / ((count-1)/2); // -1 to 1
-        const angle = t * (arcAngle/2);
+        const angle = (i / count) * Math.PI * 2;
         
-        mesh.position.x = Math.sin(angle) * radius;
-        mesh.position.z = (1 - Math.cos(angle)) * radius - 1; // Curve
+        // 完美的水平整齐排列
+        const x = Math.sin(angle) * radius;
+        const z = -Math.cos(angle) * radius; 
+        const y = 0; // 容器内相对高度为0
         
-        // Face camera naturally
-        mesh.rotation.y = -angle; 
+        mesh.position.set(x, y, z);
         
-        // Animation data
+        // 让卡牌面向圆心
+        mesh.lookAt(camera.position.x, camera.position.y - 0.5, camera.position.z);
+        
         mesh.userData = {
             introIndex: i,
             basePos: mesh.position.clone(),
-            baseRot: mesh.rotation.clone(),
-            targetPos: mesh.position.clone(),
-            targetScale: 1.0
+            angle: angle
         };
         
-        scene.add(mesh);
+        deckGroup.add(mesh);
         introCards.push(mesh);
     }
 }
@@ -965,9 +1338,30 @@ function spawnDeckIntro() {
 function updateIntroDeck() {
     if (INTERACTION.state !== 'INTRO') return;
     
-    // Raycast for general hover
+    // 0. 让牌阵始终跟随摄像机（避免视差/手势导致相对位置漂移，出现“个别卡朝向不对”）
+    if (scene.userData.deckGroup) {
+        scene.userData.deckGroup.position.copy(camera.position);
+        scene.userData.deckGroup.position.y -= 0.5;
+    }
+
+    // 1. 旋转逻辑：鼠标/手势控制整个圆环旋转
+    if (scene.userData.deckGroup) {
+        const baseSpeed = 0.0008; 
+        const interactSpeed = INTERACTION.targetPointer.x * 0.035;
+        scene.userData.deckGroup.rotation.y -= (baseSpeed + interactSpeed);
+    }
+
+    // 1.5 让每张卡始终朝向中心（摄像机），避免 group 旋转后出现“歪向/背向”
+    if (scene.userData.deckGroup && introCards.length) {
+        const target = camera.position.clone();
+        target.y -= 0.5;
+        introCards.forEach((mesh) => mesh.lookAt(target));
+    }
+
+    // 2. 射线检测
     INTERACTION.raycaster.setFromCamera(INTERACTION.pointer, camera);
     const intersects = INTERACTION.raycaster.intersectObjects(introCards);
+    
     let hoveredMesh = null;
     if (intersects.length > 0) {
         hoveredMesh = intersects[0].object;
@@ -980,63 +1374,26 @@ function updateIntroDeck() {
         document.body.style.cursor = 'default';
     }
 
-    // Fish-eye / Spread Effect Logic
-    // Convert pointer to world space at z=0 plane roughly
-    const vec = new THREE.Vector3(INTERACTION.pointer.x, INTERACTION.pointer.y, 0.5);
-    vec.unproject(camera);
-    const dir = vec.sub(camera.position).normalize();
-    const distance = (0 - camera.position.z) / dir.z; // Project to Z=0
-    const worldMouse = camera.position.clone().add(dir.multiplyScalar(distance));
-
+    // 3. 悬停动效
     introCards.forEach(mesh => {
-        const base = mesh.userData.basePos;
-        
-        // Calculate distance from mouse to card's base X position
-        // We focus mainly on X axis dist for the "spread" effect
-        const dx = worldMouse.x - base.x;
-        const dy = worldMouse.y - base.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        
-        // Effect radius
-        const radius = 2.5; 
-        
-        if (dist < radius) {
-            // Calculate influence (0 to 1)
-            const influence = Math.pow(1 - dist / radius, 2); // Quadratic falloff
-            
-            // 1. Z-Push: Bring closer
-            mesh.userData.targetPos.z = base.z + influence * 2.0; 
-            
-            // 2. Y-Lift: Lift up slightly
-            mesh.userData.targetPos.y = base.y + influence * 0.5;
-            
-            // 3. Scale Up
-            mesh.userData.targetScale = 1.0 + influence * 0.3;
-            
-            // 4. Spread X: Push away from mouse center slightly
-            // If card is to the right of mouse, push right.
-            // But we want "magnifying glass" feel, so actually just bringing it closer (Z) is enough?
-            // Let's add slight rotation to face mouse
-            mesh.userData.targetPos.x = base.x + (dx > 0 ? 1 : -1) * influence * 0.2;
+        let targetScale = 1.0;
+        let targetY = mesh.userData.basePos.y;
 
-        } else {
-            // Reset
-            mesh.userData.targetPos.copy(base);
-            mesh.userData.targetScale = 1.0;
-        }
-        
-        // Smooth Damp (Lerp)
-        mesh.position.lerp(mesh.userData.targetPos, 0.1);
-        mesh.scale.setScalar(THREE.MathUtils.lerp(mesh.scale.x, mesh.userData.targetScale, 0.1));
-        
-        // Highlighting
         if (mesh === hoveredMesh) {
-            mesh.material[4].emissive.setHex(0x222222);
-            mesh.material[5].emissive.setHex(0x222222);
+            targetScale = 1.4; // 悬停稍微放大更多
+            targetY += 0.6;   // 悬停上浮更明显
+            if (mesh.material[5].emissive) {
+                mesh.material[5].emissive.setHex(0x666666);
+            }
         } else {
-            mesh.material[4].emissive.setHex(0x000000);
-            mesh.material[5].emissive.setHex(0x000000);
+            // 移除普通状态的波动，保持绝对整齐
+            if (mesh.material[5].emissive) {
+                mesh.material[5].emissive.setHex(0x000000); 
+            }
         }
+        
+        mesh.scale.setScalar(THREE.MathUtils.lerp(mesh.scale.x, targetScale, 0.15));
+        mesh.position.y = THREE.MathUtils.lerp(mesh.position.y, targetY, 0.1);
     });
 }
 
@@ -1044,16 +1401,19 @@ function selectIntroCard(selectedMesh) {
     if (isProcessingEffect) return;
     isProcessingEffect = true;
     
-    // 1. Remove others with animation
+    // 1. 移除其他卡牌 (向外飞散消失)
     introCards.forEach(mesh => {
         if (mesh !== selectedMesh) {
-            // Fly away effect
             const dir = mesh.position.clone().normalize();
             const animateOut = () => {
-                mesh.position.add(dir.multiplyScalar(0.5));
+                mesh.position.add(dir.multiplyScalar(0.3)); // 向外飞
+                mesh.material.forEach(m => {
+                    if(m.transparent) m.opacity -= 0.05;
+                });
                 mesh.scale.multiplyScalar(0.9);
+                
                 if (mesh.scale.x < 0.1) {
-                    scene.remove(mesh);
+                    if(mesh.parent) mesh.parent.remove(mesh);
                 } else {
                     requestAnimationFrame(animateOut);
                 }
@@ -1061,12 +1421,25 @@ function selectIntroCard(selectedMesh) {
             animateOut();
         }
     });
-    introCards = []; // Clear array reference
+    introCards = [];
     
-    // 2. Transition selected mesh to be the main 'cardMesh'
+    // 2. 将选中的卡牌从 Group 转移到 Scene (保持世界坐标)
+    if (scene.userData.deckGroup) {
+        const worldPos = new THREE.Vector3();
+        const worldQuat = new THREE.Quaternion();
+        selectedMesh.getWorldPosition(worldPos);
+        selectedMesh.getWorldQuaternion(worldQuat);
+        
+        // Detach from parent and attach to scene root
+        scene.attach(selectedMesh);
+        
+        scene.remove(scene.userData.deckGroup);
+        scene.userData.deckGroup = null;
+    }
+
     cardMesh = selectedMesh;
     
-    // Generate actual data for this card now (Lazy load)
+    // 3. 生成卡牌数据
     if (deck.length === 0) return;
     const index = Math.floor(Math.random() * deck.length);
     const cardData = deck[index];
@@ -1131,8 +1504,8 @@ function selectIntroCard(selectedMesh) {
         cardMesh.rotation.y = THREE.MathUtils.lerp(startRot.y, Math.PI, ease); // Face back
         cardMesh.rotation.z = THREE.MathUtils.lerp(startRot.z, 0, ease);
         
-        // Scale up to normal size
-        cardMesh.scale.setScalar(1 + (2/1.5 - 1) * ease); // 1.5 -> 2.0 width
+        // Scale to normal - Keep it elegant
+        cardMesh.scale.setScalar(1.0); 
         
         if (progress < 1) {
             requestAnimationFrame(animateToCenter);
@@ -1146,118 +1519,84 @@ function selectIntroCard(selectedMesh) {
     animateToCenter();
 }
 
-function spawnCard() {
-    if (deck.length === 0) {
-        document.getElementById('status-text').innerText = "牌库已空，命运已定。";
-        return;
-    }
-    // ... Old spawn logic mostly replaced by Intro for first run, 
-    // but useful for subsequent draws.
-    // Let's keep it for "Next Card" logic.
-    
-    // Random selection
-    const index = Math.floor(Math.random() * deck.length);
-    const cardData = deck[index];
-    deck.splice(index, 1); // Remove from deck
+// NOTE: `spawnCard()` 已废弃（当前抽取都通过环绕牌阵选择）
 
-    // Orientation logic
-    const isReversed = Math.random() < 0.5;
-    
-    // Geometry
-    const geometry = new THREE.BoxGeometry(2, 3.5, 0.02);
-    
-    // Materials
-    const loader = new THREE.TextureLoader();
-    const matSide = globalMaterials?.side || new THREE.MeshStandardMaterial({ color: 0x35225e, emissive: 0x1a103c });
-    
-    // Front Texture (Face) - Magic Shader
-    const texFront = loader.load(cardData.url);
-    texFront.center.set(0.5, 0.5); 
-    
-    const matFront = new THREE.ShaderMaterial({
-        uniforms: {
-            map: { value: texFront },
-            colorDark: { value: new THREE.Color('#1a103c') },
-            colorLight: { value: new THREE.Color('#ffd700') },
-            colorAccent: { value: new THREE.Color('#fff0a0') },
-            time: { value: 0 }
-        },
-        vertexShader: MagicCardShader.vertexShader,
-        fragmentShader: MagicCardShader.fragmentShader
-    });
-
-    // Back Texture
-    const matBack = globalMaterials?.back || new THREE.MeshStandardMaterial({ color: 0x35225e });
-
-    const materials = [matSide, matSide, matSide, matSide, matFront, matBack];
-
-    const mesh = new THREE.Mesh(geometry, materials);
-    
-    // Initial Position (Bottom up spawn for subsequent cards)
-    mesh.position.set(0, -5, 0); 
-    mesh.rotation.y = Math.PI; 
-    
-    // Store data
-    mesh.userData = {
-        data: cardData,
-        isReversed: isReversed
-    };
-
-    scene.add(mesh);
-    cardMesh = mesh;
-
-    // Reset interaction
-    INTERACTION.state = 'IDLE';
-    isProcessingEffect = false;
-}
-
-// ================= 粒子灰烬效果 =================
-function createAshEffect(position, color) {
-    const particleCount = 2000;
+// ================= 粒子灰烬效果 -> 改为：星光解体 (Stardust Dissolve) =================
+function createAshEffect(position) {
+    const particleCount = 1500;
     const geometry = new THREE.BufferGeometry();
     const positions = [];
     const velocities = [];
-    const opacities = [];
+    const colors = [];
     const sizes = [];
+
+    const baseColor = new THREE.Color('#ffd700');
+    const accentColor = new THREE.Color('#ffffff');
 
     // Create particles within the card's bounding box
     for (let i = 0; i < particleCount; i++) {
-        // Random pos within roughly card size (2 x 3.5)
-        const px = position.x + (Math.random() - 0.5) * 2;
-        const py = position.y + (Math.random() - 0.5) * 3.5;
+        // Random pos within roughly card size (1.2 x 2.1)
+        const px = position.x + (Math.random() - 0.5) * 1.2;
+        const py = position.y + (Math.random() - 0.5) * 2.1;
         const pz = position.z + (Math.random() - 0.5) * 0.1;
         positions.push(px, py, pz);
 
-        // Velocity: drift up + turbulence
+        // Velocity: Explode outwards gently + drift up
+        const speed = 0.02 + Math.random() * 0.03;
+        const angle = Math.random() * Math.PI * 2;
+        const rise = Math.random() * 0.05 + 0.01;
+        
         velocities.push(
-            (Math.random() - 0.5) * 0.05, // x
-            Math.random() * 0.05 + 0.02,  // y (up)
-            (Math.random() - 0.5) * 0.05  // z
+            Math.cos(angle) * speed, // x
+            rise,                    // y (up)
+            Math.sin(angle) * speed  // z
         );
 
-        opacities.push(1.0);
-        sizes.push(Math.random() * 0.1 + 0.02);
+        // Color: Mix of Gold and White
+        const col = Math.random() > 0.3 ? baseColor : accentColor;
+        colors.push(col.r, col.g, col.b);
+
+        sizes.push(Math.random() * 0.15 + 0.05); // Larger, glowing particles
     }
 
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
-    geometry.setAttribute('opacity', new THREE.Float32BufferAttribute(opacities, 1));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
 
-    // Shader Material for custom fading
+    // Custom Shader Material for glowing particles
     const material = new THREE.PointsMaterial({
-        color: 0x00f3ff,
+        vertexColors: true,
         size: 0.1,
         transparent: true,
-        opacity: 0.8,
+        opacity: 1.0,
         blending: THREE.AdditiveBlending,
-        depthWrite: false
+        depthWrite: false,
+        map: getParticleTexture() // Soft glow texture (cached)
     });
 
     const particleSystem = new THREE.Points(geometry, material);
-    particleSystem.userData = { life: 100 }; // frames
+    particleSystem.userData = { life: 120 }; // frames
     scene.add(particleSystem);
     particles.push(particleSystem);
+}
+
+// Helper: Cached soft glow texture for particles
+let _particleTex = null;
+function getParticleTexture() {
+    if (_particleTex) return _particleTex;
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    grad.addColorStop(0.4, 'rgba(255, 215, 0, 0.5)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 32, 32);
+    _particleTex = new THREE.CanvasTexture(canvas);
+    return _particleTex;
 }
 
 // ================= 解读（Reading） =================
@@ -1279,6 +1618,8 @@ async function fetchAIInterpretation(record) {
     
     // Add loading indicator
     const aiSectionId = `ai-reading-${record.ts}`;
+    const old = document.getElementById(aiSectionId);
+    if (old) old.remove();
     const aiSection = document.createElement('div');
     aiSection.id = aiSectionId;
     aiSection.innerHTML = `
@@ -1287,14 +1628,13 @@ async function fetchAIInterpretation(record) {
     `;
     bodyEl.appendChild(aiSection);
 
-    const prompt = `作为塔罗占卜师，请解读这张牌：${name}（${orientation}）。
-它的核心含义是：${meaning}。
-请结合此含义，给我一段简洁、治愈且富有哲理的解读，并给出一个明确的行动建议。
-字数 150 字左右，语气温柔且充满智慧。`;
+    const ctx = record.aiPromptContext || loadAIContext();
+    record.aiPromptContext = ctx;
+    const prompt = buildAIPrompt({ name, orientation, meaning }, ctx);
 
     try {
         if (!API_CONFIG.key || API_CONFIG.key.includes("你的")) {
-            throw new Error("请在代码第 1165 行配置您的国内 API Key");
+            throw new Error("请先在 API_CONFIG.key 配置你的 API Key");
         }
 
         let result = "";
@@ -1345,39 +1685,65 @@ async function fetchAIInterpretation(record) {
     }
 }
 
-const READING_TEMPLATES = {
-    openers: [
-        "这张牌像是在提醒你：别急着定义结果，先看清当下的能量走向。",
-        "它更像一盏灯，照出你正在经历的主题与隐含的选择。",
-        "把它当作一条路标：指向你此刻最需要面对的核心问题。"
-    ],
-    advice: [
-        "先把能控制的部分做扎实，剩下的交给时间发酵。",
-        "把注意力从“别人怎么看”收回来，回到你的真实需求。",
-        "用更小的步骤推进：先完成 20%，再迭代到 80%。"
-    ],
-    caution: [
-        "避免在情绪高点/低谷时做不可逆决定。",
-        "别把短期波动当成长期结论。",
-        "警惕过度承诺与拖延的两极摇摆。"
-    ]
+// ===== AI Prompt Context =====
+const AI_CONTEXT_DEFAULT = {
+    question: "",
+    domain: "通用",
+    timeHorizon: "7天"
 };
 
-function pickOne(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+function loadAIContext() {
+    try {
+        const raw = localStorage.getItem('tarot_ai_ctx');
+        if (!raw) return { ...AI_CONTEXT_DEFAULT };
+        const parsed = JSON.parse(raw);
+        return {
+            question: String(parsed.question || ""),
+            domain: String(parsed.domain || "通用"),
+            timeHorizon: String(parsed.timeHorizon || "7天")
+        };
+    } catch {
+        return { ...AI_CONTEXT_DEFAULT };
+    }
+}
+
+function saveAIContext(ctx) {
+    try {
+        localStorage.setItem('tarot_ai_ctx', JSON.stringify(ctx));
+    } catch {}
+}
+
+function buildAIPrompt(card, ctx) {
+    const q = (ctx.question || "").trim();
+    const domain = ctx.domain || "通用";
+    const horizon = ctx.timeHorizon || "7天";
+
+    const questionLine = q ? `我的问题/主题：${q}` : `我的问题/主题：未提供（请给出通用指导）`;
+
+    return [
+        "你是一位专业塔罗占卜师与咨询教练。请基于抽到的牌给出“指导性解读”，重点是帮助我做决定与行动，而不是玄学断言。",
+        "",
+        `牌：${card.name}（${card.orientation}）`,
+        `核心牌意：${card.meaning}`,
+        questionLine,
+        `领域：${domain}`,
+        `时间范围：${horizon}`,
+        "",
+        "输出要求（必须按以下结构）：",
+        "1）一句话主题：点出我当下最需要面对的核心课题。",
+        "2）现状洞察：把牌意落到我的处境（具体、贴近现实）。",
+        "3）盲点/阻碍：指出 1-2 个我可能忽略的关键点。",
+        "4）行动建议（最重要）：给 3 条可执行建议，每条包含“具体动作 + 适用场景 + 时间范围”。",
+        "5）反思提问：给我 2 个高质量自问句。",
+        "",
+        "风格：温柔但不含糊；少鸡汤，多落地；不要保证结果，不要算命式断言；避免医疗/法律/投资等专业结论。",
+        "字数：180-260字。"
+    ].join("\n");
 }
 
 function buildReading(record) {
     const { name, isReversed, meaning, ts } = record;
     const orientation = isReversed ? "逆位" : "正位";
-    const opener = pickOne(READING_TEMPLATES.openers);
-    const advice = pickOne(READING_TEMPLATES.advice);
-    const caution = pickOne(READING_TEMPLATES.caution);
-
-    const focus = isReversed
-        ? "逆位更强调“阻滞/偏差/内耗”，建议先复盘原因，再做方向性调整。"
-        : "正位更强调“顺势/显化/推进”，适合把机会落到行动与节奏上。";
-
     const timeStr = new Date(ts).toLocaleString();
 
     const chips = [
@@ -1387,33 +1753,16 @@ function buildReading(record) {
 
     const html = `
         ${chips}
-        <h4>总体</h4>
-        <p>${opener}</p>
         <h4>牌意（${orientation}）</h4>
         <p>${meaning}</p>
-        <h4>你可以怎么做</h4>
-        <p>${focus}</p>
-        <p>${advice}</p>
-        <h4>提醒</h4>
-        <p>${caution}</p>
     `;
 
     const plain = [
         `【${name}｜${orientation}】`,
         `时间：${timeStr}`,
         "",
-        "总体：",
-        opener,
-        "",
-        `牌意（${orientation}）：`,
-        meaning,
-        "",
-        "你可以怎么做：",
-        focus,
-        advice,
-        "",
-        "提醒：",
-        caution
+        `核心牌意：`,
+        meaning
     ].join("\n");
 
     return { html, plain, orientation };
@@ -1433,8 +1782,63 @@ function openReading(recordIndex) {
     orientEl.textContent = reading.orientation;
     bodyEl.innerHTML = reading.html;
 
+    // AI Context UI (prompt variables)
+    const ctx = record.aiPromptContext || loadAIContext();
+    record.aiPromptContext = ctx;
+    const ctxEl = document.createElement('div');
+    ctxEl.className = 'ai-context';
+    ctxEl.innerHTML = `
+        <div class="ai-context-title">
+            <span>AI 提问设置（可选）</span>
+            <button class="btn btn-mini btn-ghost" id="btn-ai-regenerate">重新生成AI</button>
+        </div>
+        <div class="ai-fields">
+            <div class="ai-field" style="grid-column: 1 / -1;">
+                <div class="ai-label">问题 / 主题</div>
+                <textarea class="ai-input" id="ai-question" placeholder="例如：我该不该换工作？这段关系是否要继续？">${escapeHtml(ctx.question || "")}</textarea>
+            </div>
+            <div class="ai-field">
+                <div class="ai-label">领域</div>
+                <select class="ai-select" id="ai-domain">
+                    ${renderOptions(["通用","感情","事业","学业","财务","人际","健康","自我成长"], ctx.domain || "通用")}
+                </select>
+            </div>
+            <div class="ai-field">
+                <div class="ai-label">时间范围</div>
+                <select class="ai-select" id="ai-horizon">
+                    ${renderOptions(["48小时","7天","30天","3个月"], ctx.timeHorizon || "7天")}
+                </select>
+            </div>
+        </div>
+    `;
+    bodyEl.appendChild(ctxEl);
+
     panel.classList.remove('hidden');
     panel.dataset.activeIndex = String(recordIndex);
+
+    // Wire context inputs
+    const qEl = document.getElementById('ai-question');
+    const dEl = document.getElementById('ai-domain');
+    const hEl = document.getElementById('ai-horizon');
+    const btnRegen = document.getElementById('btn-ai-regenerate');
+
+    const syncCtx = () => {
+        const newCtx = {
+            question: String(qEl?.value || ""),
+            domain: String(dEl?.value || "通用"),
+            timeHorizon: String(hEl?.value || "7天")
+        };
+        record.aiPromptContext = newCtx;
+        saveAIContext(newCtx);
+    };
+    qEl?.addEventListener('input', syncCtx);
+    dEl?.addEventListener('change', syncCtx);
+    hEl?.addEventListener('change', syncCtx);
+    btnRegen?.addEventListener('click', () => {
+        syncCtx();
+        record.aiInterpretation = null;
+        fetchAIInterpretation(record);
+    });
 
     // Trigger AI interpretation if not already present
     if (!record.aiInterpretation) {
@@ -1450,15 +1854,17 @@ function openReading(recordIndex) {
     }
 }
 
-function closeReading() {
-    const panel = document.getElementById('reading-panel');
-    panel.classList.add('hidden');
+function escapeHtml(s) {
+    return String(s)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
 
-    // If ash already finished, spawn next card after closing
-    if (pendingNextCard && particles.length === 0 && !cardMesh) {
-        pendingNextCard = false;
-        setTimeout(() => spawnCard(), 350);
-    }
+function renderOptions(options, selected) {
+    return options.map(v => `<option value="${escapeHtml(v)}"${v === selected ? ' selected' : ''}>${escapeHtml(v)}</option>`).join('');
 }
 
 async function copyReading() {
@@ -1495,34 +1901,31 @@ function updateParticles() {
             positions[j * 3 + 1] += velocities[j * 3 + 1]; // y
             positions[j * 3 + 2] += velocities[j * 3 + 2]; // z
 
-            // Noise/Turbulence
-            velocities[j * 3] += (Math.random() - 0.5) * 0.002;
-            velocities[j * 3 + 2] += (Math.random() - 0.5) * 0.002;
+            // Drag (slow down explosion)
+            velocities[j * 3] *= 0.98;
+            velocities[j * 3 + 2] *= 0.98;
         }
 
         p.geometry.attributes.position.needsUpdate = true;
-        p.material.opacity = p.userData.life / 100;
-
+        
+        // Life fade
+        const alpha = p.userData.life / 120;
+        p.material.opacity = alpha;
+        
         if (p.userData.life <= 0) {
             scene.remove(p);
             p.geometry.dispose();
             p.material.dispose();
             particles.splice(i, 1);
-            // If ash finished and user already closed reading, spawn next
-            if (particles.length === 0 && pendingNextCard) {
-                const panel = document.getElementById('reading-panel');
-                const isHidden = panel.classList.contains('hidden');
-                if (isHidden && !cardMesh) {
-                    pendingNextCard = false;
-                    setTimeout(() => spawnCard(), 350);
-                }
-            }
         }
     }
 }
 
 // ================= 主循环与交互逻辑 =================
 function updateInteraction() {
+    // Smooth pointer movement
+    INTERACTION.pointer.lerp(INTERACTION.targetPointer, 0.2);
+
     // Intro Deck Logic
     if (INTERACTION.state === 'INTRO') {
         updateIntroDeck();
@@ -1542,8 +1945,8 @@ function updateInteraction() {
     // Parallax Effect: Camera moves slightly opposite to pointer
     const parallaxX = INTERACTION.pointer.x * 0.5;
     const parallaxY = INTERACTION.pointer.y * 0.5;
-    camera.position.x += (parallaxX - camera.position.x) * 0.05;
-    camera.position.y += (parallaxY - camera.position.y) * 0.05;
+    camera.position.x += (parallaxX - camera.position.x) * 0.1;
+    camera.position.y += (parallaxY - camera.position.y) * 0.1;
     camera.lookAt(0, 0, 0);
 
     switch (INTERACTION.state) {
@@ -1575,8 +1978,8 @@ function updateInteraction() {
             const distance = (targetZ - camera.position.z) / dir.z;
             const pos = camera.position.clone().add(dir.multiplyScalar(distance));
             
-            // Add slight "weight" lag
-            cardMesh.position.lerp(pos, 0.08);
+            // Add slight "weight" lag - Snappier follow
+            cardMesh.position.lerp(pos, 0.2);
 
             // Rotate to face front
             const targetRotZ = cardMesh.userData.isReversed ? Math.PI : 0;
@@ -1584,10 +1987,7 @@ function updateInteraction() {
             cardMesh.rotation.y = THREE.MathUtils.lerp(cardMesh.rotation.y, 0, 0.1);
             cardMesh.rotation.z = THREE.MathUtils.lerp(cardMesh.rotation.z, targetRotZ, 0.1);
 
-            // Light up
-            scene.userData.pointLight.intensity = 2;
-            scene.userData.pointLight.position.copy(cardMesh.position);
-            scene.userData.pointLight.position.z += 1;
+            // (no lights)
 
             // Charge Logic (FIST)
             if (INTERACTION.gesture === 'FIST') {
@@ -1617,7 +2017,6 @@ function updateInteraction() {
                 
                 if (INTERACTION.gesture === 'OPEN') {
                     INTERACTION.state = 'IDLE';
-                    scene.userData.pointLight.intensity = 0;
                     document.getElementById('status-text').innerText = "已松开";
                 }
             }
@@ -1659,7 +2058,7 @@ function confirmSelection() {
         <div class="history-meaning">${meaning}</div>
     `;
     historyPanel.prepend(item);
-    
+
     document.getElementById('status-text').innerText = `已记录：${data.name} ${statusStr}`;
 
     // Click to open reading
@@ -1667,18 +2066,28 @@ function confirmSelection() {
 
     // Auto open reading after confirm
     openReading(recordIndex);
-    pendingNextCard = true;
+    
+    // Mark pending next but DON'T remove card yet
+    pendingNextCard = true; 
+}
 
-    // Ash Effect
-    createAshEffect(cardMesh.position);
-    
-    // Remove Card Mesh
-    scene.remove(cardMesh);
-    cardMesh.geometry.dispose();
-    cardMesh.material.forEach(m => m.dispose());
-    cardMesh = null;
-    
-    scene.userData.pointLight.intensity = 0;
+function closeReading() {
+    const panel = document.getElementById('reading-panel');
+    panel.classList.add('hidden');
+
+    // 如果有待处理的卡牌（刚刚抽完的）
+    if (pendingNextCard && cardMesh) {
+        // 触发灰烬效果
+        createAshEffect(cardMesh.position);
+        
+        scene.remove(cardMesh);
+        cardMesh.geometry.dispose();
+        cardMesh.material.forEach(m => m.dispose());
+        cardMesh = null;
+        // 1.5秒后重新生成 3D 环绕牌阵，回到选择界面
+        setTimeout(() => spawnDeckIntro(), 1500); 
+        pendingNextCard = false;
+    }
 }
 
 function animate() {
@@ -1687,19 +2096,24 @@ function animate() {
     const time = Date.now() * 0.001;
     
     // Update Shader Time
-    if (cardMesh && cardMesh.userData.shaderMats) {
-        cardMesh.userData.shaderMats.forEach(m => {
-            if(m.uniforms) m.uniforms.time.value = time;
-        });
-    }
-    // Also for spawnCard created mesh (which might not have shaderMats array structure yet, let's standarize)
-    // Quick fix: check material[4]
-    if (cardMesh && cardMesh.material && cardMesh.material[4] && cardMesh.material[4].uniforms) {
-        cardMesh.material[4].uniforms.time.value = time;
+    if (cardMesh) {
+        if (cardMesh.userData?.shaderMats?.length) {
+            cardMesh.userData.shaderMats.forEach(m => { if (m?.uniforms?.time) m.uniforms.time.value = time; });
+        } else if (cardMesh.material && cardMesh.material[4]?.uniforms?.time) {
+            // front face shader (fallback)
+            cardMesh.material[4].uniforms.time.value = time;
+        }
     }
 
     updateInteraction();
     updateParticles();
+
+    // Rotate Zodiac Wheel background
+    if (scene.userData.zodiacWheel) {
+        scene.userData.zodiacWheel.rotation.z += 0.0005;
+    }
+
+    updateAura(time);
 
     renderer.render(scene, camera);
 }
